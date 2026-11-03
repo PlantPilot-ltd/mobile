@@ -21,9 +21,9 @@ class CoreUiButton extends StatelessWidget {
     super.key,
     required this.title,
     required this.onTap,
-  })  : color = CoreUIColors.background,
-        backgroundColor = CoreUIColors.primary,
-        borderColor = null;
+  }) : color = CoreUIColors.background,
+       backgroundColor = CoreUIColors.primary,
+       borderColor = null;
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +42,10 @@ class CoreUiButton extends StatelessWidget {
               onTap: onTap,
               highlightColor: borderColor?.withValues(alpha: 0.1),
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 16,
+                ),
                 child: Center(
                   child: Text(
                     title,
@@ -69,20 +71,18 @@ class _BorderDecoration extends StatelessWidget {
   final Color? borderColor;
   final Widget child;
 
-  const _BorderDecoration({
-    this.borderColor,
-    required this.child,
-  });
+  const _BorderDecoration({this.borderColor, required this.child});
 
   @override
   Widget build(BuildContext context) {
     if (borderColor == null) return child;
     return DottedBorder(
-      borderType: BorderType.RRect,
-      radius: const Radius.circular(12),
-      dashPattern: [9, 6],
-      strokeWidth: 2,
-      color: borderColor!,
+      options: RoundedRectDottedBorderOptions(
+        radius: const Radius.circular(12),
+        dashPattern: [9, 6],
+        strokeWidth: 2,
+        color: borderColor!,
+      ),
       child: child,
     );
   }

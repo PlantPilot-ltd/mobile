@@ -89,8 +89,10 @@ abstract class HttpService {
 
       // Sign out if refresh token failed
       if (responseException is UnauthorizedException) {
-        final unauthException =
-            configuration.onUnauthorizedException(response, responseException);
+        final unauthException = configuration.onUnauthorizedException(
+          response,
+          responseException,
+        );
         if (unauthException != null) {
           return ThrowableResponse.failure(unauthException);
         }
@@ -106,7 +108,7 @@ abstract class HttpService {
         if (!isRefreshed) {
           return ThrowableResponse.failure(responseException);
         }
-        return makeRequest(
+        return await makeRequest(
           serializer,
           url,
           queryParameters: queryParameters,
@@ -126,9 +128,7 @@ abstract class HttpService {
       if (response.body.isEmpty) {
         return ThrowableResponse.success(serializer({}));
       }
-      return ThrowableResponse.success(
-        serializer(jsonDecode(response.body)),
-      );
+      return ThrowableResponse.success(serializer(jsonDecode(response.body)));
     } catch (e, stackTrace) {
       return ThrowableResponse.failure(
         AppException.fromException(e, stackTrace),

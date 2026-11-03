@@ -1,12 +1,10 @@
 import 'package:app/services/index.dart';
 import 'package:core/core.dart';
 
-abstract class GreenhousesCacheServiceBase extends CacheService {
-  GreenhousesCacheServiceBase({required super.configuration});
+abstract class GreenhousesCacheServiceBase extends CacheServiceBase {
+  Future<ThrowableResponse<List<GreenhouseCacheModel>>> getGreenhouses();
 
-  ThrowableResponse<List<GreenhouseCacheModel>> getGreenhouses();
+  Future<VoidThrowableResponse> addGreenhouse(GreenhouseCacheModel model);
 
-  VoidThrowableResponse addGreenhouse(GreenhouseCacheModel model);
-
-  VoidThrowableResponse removeGreenhouse(GreenhouseCacheModel model);
+  Future<VoidThrowableResponse> removeGreenhouse(GreenhouseCacheModel model);
 }

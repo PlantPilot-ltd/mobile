@@ -1,13 +1,16 @@
 import 'package:core/core.dart';
+import 'package:sembast/sembast.dart';
 
-class AppCacheException extends AppException {
-  const AppCacheException(super.message, super.stackTrace);
+class CacheServiceException extends AppException {
+  final StoreRef store;
 
-  static AppException fromException(Object e, StackTrace stackTrace) {
-    if (e is Exception) {
-      return AppCacheException(e.toString(), stackTrace);
-    } else {
-      return AppException.fromException(e, stackTrace);
-    }
-  }
+  const CacheServiceException(
+    this.store, {
+    super.message,
+    super.origin,
+    super.stackTrace,
+  });
+
+  @override
+  String toString() => '${super.toString()}\nStore box: ${store.name}';
 }

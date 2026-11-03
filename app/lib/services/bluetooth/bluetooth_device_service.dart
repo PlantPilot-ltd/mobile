@@ -25,12 +25,12 @@ class BluetoothDeviceService with Store {
   StreamSubscription? _deviceConnectionStateSubscription;
 
   BluetoothDeviceService({
-    required LogService logger,
+    required this._logger,
     required this.config,
     required BluetoothDeviceModel device,
     required this.onConnectionChange,
     required this.onBluetoothData,
-  }) : _logger = logger {
+  }) {
     _init(device);
   }
 
@@ -65,6 +65,8 @@ class BluetoothDeviceService with Store {
       _initDeviceConnectionListener(blDevice);
 
       await blDevice.connect(
+        // TODO: Check
+        license: .nonprofit,
         timeout: config.connectionTimeout,
         autoConnect: autoConnect,
         mtu: null,
@@ -94,10 +96,14 @@ class BluetoothDeviceService with Store {
   ) async {
     try {
       await blDevice.discoverServices();
-      _deviceReceiveChar =
-          _getCharacteristics(blDevice, config.receiveCharacteristicUUID);
-      _deviceSendChar =
-          _getCharacteristics(blDevice, config.sendCharacteristicUUID);
+      _deviceReceiveChar = _getCharacteristics(
+        blDevice,
+        config.receiveCharacteristicUUID,
+      );
+      _deviceSendChar = _getCharacteristics(
+        blDevice,
+        config.sendCharacteristicUUID,
+      );
 
       _startDataListener();
       return const VoidThrowableResponse.success();
@@ -141,18 +147,17 @@ class BluetoothDeviceService with Store {
     try {
       final blDevice = _connection.device.toBlModel();
 
-      _deviceSendChar ??=
-          _getCharacteristics(blDevice, config.sendCharacteristicUUID);
+      _deviceSendChar ??= _getCharacteristics(
+        blDevice,
+        config.sendCharacteristicUUID,
+      );
       if (_deviceSendChar == null) {
         return _logException(
           BluetoothNoCharacteristicError(config.sendCharacteristicUUID),
         );
       }
 
-      await _deviceSendChar!.write(
-        encoder(model),
-        timeout: timeout,
-      );
+      await _deviceSendChar!.write(encoder(model), timeout: timeout);
       return const VoidThrowableResponse.success();
     } catch (e, s) {
       return _logException(AppException.fromException(e, s));
@@ -215,18 +220,17 @@ class BluetoothDeviceService with Store {
   Future<void> _onDataCaptureTick() async {
     try {
       final blDevice = _connection.device.toBlModel();
-      _deviceReceiveChar ??=
-          _getCharacteristics(blDevice, config.sendCharacteristicUUID);
+      _deviceReceiveChar ??= _getCharacteristics(
+        blDevice,
+        config.sendCharacteristicUUID,
+      );
       if (_deviceReceiveChar == null) {
         _stopDataListener();
         return;
       }
       final data = await _deviceReceiveChar!.read();
       onBluetoothData(
-        BluetoothDataModel(
-          data: data,
-          timeStamp: DateTime.now(),
-        ),
+        BluetoothDataModel(data: data, timeStamp: DateTime.now()),
       );
     } catch (e, s) {
       _logException(AppException.fromException(e, s));

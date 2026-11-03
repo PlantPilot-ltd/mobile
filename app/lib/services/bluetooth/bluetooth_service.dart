@@ -16,22 +16,25 @@ class BluetoothService {
   final void Function(List<BluetoothScanResultModel>) onScanResultsChange;
 
   BluetoothService({
-    required LogService logger,
+    required this._logger,
     required this.config,
     required this.onBluetoothStateChange,
     required this.onScanningStateChange,
     required this.onScanResultsChange,
-  }) : _logger = logger {
+  }) {
     _init();
   }
 
   void _init() {
-    _bluetoothStateSubscription =
-        bl.FlutterBluePlus.adapterState.listen(_onBluetoothStateChange);
-    _scanningStateSubscription =
-        bl.FlutterBluePlus.isScanning.listen(_onScanningStateChange);
-    _scanResultsSubscription =
-        bl.FlutterBluePlus.scanResults.listen(_onScanResultsChange);
+    _bluetoothStateSubscription = bl.FlutterBluePlus.adapterState.listen(
+      _onBluetoothStateChange,
+    );
+    _scanningStateSubscription = bl.FlutterBluePlus.isScanning.listen(
+      _onScanningStateChange,
+    );
+    _scanResultsSubscription = bl.FlutterBluePlus.scanResults.listen(
+      _onScanResultsChange,
+    );
     _onBluetoothStateChange(bl.FlutterBluePlus.adapterStateNow);
     _onScanningStateChange(bl.FlutterBluePlus.isScanningNow);
   }
@@ -117,9 +120,7 @@ class BluetoothService {
         return _logException(const BluetoothDisabledError());
     }
     try {
-      bl.FlutterBluePlus.startScan(
-        withServices: [bl.Guid(config.serviceUUID)],
-      );
+      bl.FlutterBluePlus.startScan(withServices: [bl.Guid(config.serviceUUID)]);
       return const VoidThrowableResponse.success();
     } catch (e, s) {
       return _logException(AppException.fromException(e, s));

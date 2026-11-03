@@ -14,7 +14,7 @@ enum PlantTypeHttpModel {
       case 'large':
         return PlantTypeHttpModel.large;
       default:
-        throw AppException('Invalid plant type: $type');
+        throw AppException(message: 'Invalid plant type: $type');
     }
   }
 }

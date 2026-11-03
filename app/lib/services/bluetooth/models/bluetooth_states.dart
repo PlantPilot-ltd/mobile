@@ -7,7 +7,7 @@ enum BluetoothStateModel {
   turningOn,
   on,
   turningOff,
-  off
+  off,
 }
 
 extension BluetoothStateExtension on BluetoothStateModel {
@@ -34,11 +34,9 @@ extension BluetoothConnectionStateExtension on BluetoothConnectionStateModel {
     bl.BluetoothConnectionState model,
   ) {
     return switch (model) {
-      (bl.BluetoothConnectionState.disconnected) =>
-        BluetoothConnectionStateModel.disconnected,
-      (bl.BluetoothConnectionState.connected) =>
+      bl.BluetoothConnectionState.connected =>
         BluetoothConnectionStateModel.connected,
-      (_) => BluetoothConnectionStateModel.disconnected,
+      _ => BluetoothConnectionStateModel.disconnected,
     };
   }
 }

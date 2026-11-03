@@ -1,5 +1,6 @@
 part of '../core.dart';
 
+// TODO: Remove, use try/catch
 class ThrowableResponse<T> {
   final T? result;
   final Exception? failure;
@@ -27,5 +28,5 @@ class ThrowableResponse<T> {
 class VoidThrowableResponse extends ThrowableResponse<void> {
   const VoidThrowableResponse.success() : super._(null, null);
   const VoidThrowableResponse.failure(Exception failure)
-      : super._(null, failure);
+    : super._(null, failure);
 }

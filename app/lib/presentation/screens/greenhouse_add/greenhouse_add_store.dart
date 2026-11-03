@@ -35,25 +35,22 @@ abstract class _GreenhouseAddStore extends VPDDataStore with Store {
   List<PlantEntity> selectedPlants = [];
 
   @computed
-  BluetoothScanResultEntity? get scannedDevice =>
-      _bluetoothRepository.lastScanResults
-          .firstWhereOrNull((e) => e.device.remoteId == _device.remoteId);
+  BluetoothScanResultEntity? get scannedDevice => _bluetoothRepository
+      .lastScanResults
+      .firstWhereOrNull((e) => e.device.remoteId == _device.remoteId);
 
   _GreenhouseAddStore(GreenhouseAddDependencies dependencies)
-      : _device = dependencies.device,
-        _logger = dependencies.logger,
-        _bluetoothRepository = dependencies.bluetoothRepository,
-        _greenhousesRepository = dependencies.greenhousesRepository,
-        _plantsHttpService = dependencies.plantsHttpService,
-        _configHttpService = dependencies.configHttpService;
+    : _device = dependencies.device,
+      _logger = dependencies.logger,
+      _bluetoothRepository = dependencies.bluetoothRepository,
+      _greenhousesRepository = dependencies.greenhousesRepository,
+      _plantsHttpService = dependencies.plantsHttpService,
+      _configHttpService = dependencies.configHttpService;
 
   @action
   Future<void> fetchData() async {
     isLoading = true;
-    await Future.wait([
-      _fetchConfig(),
-      _fetchPlants(),
-    ]);
+    await Future.wait([_fetchConfig(), _fetchPlants()]);
     isLoading = false;
   }
 
@@ -100,7 +97,7 @@ abstract class _GreenhouseAddStore extends VPDDataStore with Store {
     this.name = name;
   }
 
-  VoidThrowableResponse addGreenhouse() {
+  Future<VoidThrowableResponse> addGreenhouse() {
     return _greenhousesRepository.addGreenhouse(
       GreenhouseEntity(
         remoteId: _device.remoteId,

@@ -22,10 +22,10 @@ abstract class _GreenhousesRepository extends VPDDataStore with Store {
   late final BluetoothDeviceService _bluetoothDeviceService;
 
   _GreenhousesRepository({
-    required LogService logger,
+    required this._logger,
     required BluetoothConfigurationModel config,
     required BluetoothDeviceEntity device,
-  }) : _logger = logger {
+  }) {
     _bluetoothDeviceService = BluetoothDeviceService(
       logger: _logger,
       config: config,
@@ -50,9 +50,7 @@ abstract class _GreenhousesRepository extends VPDDataStore with Store {
       return;
     }
     try {
-      state = GreenhouseStateEntity(
-        data: utf8.decode(connectionData.data),
-      );
+      state = GreenhouseStateEntity(data: utf8.decode(connectionData.data));
     } catch (e, s) {
       _logger.logException(e, s);
     }

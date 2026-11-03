@@ -1,48 +1,58 @@
 import 'package:app/services/index.dart';
 import 'package:core/core.dart';
-import 'package:hive/hive.dart';
+import 'package:sembast/sembast.dart';
 
-class GreenhousesCacheService extends GreenhousesCacheServiceBase {
-  late final Box<GreenhouseCacheModel> _controllersBox;
+class GreenhousesCacheService extends GreenhousesCacheServiceBase
+    with CacheService {
+  @override
+  final Database database;
 
-  GreenhousesCacheService({required super.configuration}) {
-    Hive.registerAdapter(
-      'TentControllerCacheModel',
-      GreenhouseCacheModel.fromJson,
-    );
-    _controllersBox = Hive.box<GreenhouseCacheModel>(
-      name: 'tent_controllers_box',
-      directory: configuration.directory,
-    );
+  IntMapStore get _listStore => IntMapStore.main();
+
+  GreenhousesCacheService(this.database);
+
+  @override
+  Future<void> cleanCache() async {
+    await cleanStore(_listStore);
   }
 
   @override
-  void cleanCache() {
-    _controllersBox.clear();
+  Future<ThrowableResponse<List<GreenhouseCacheModel>>> getGreenhouses() async {
+    try {
+      final result = await fetchItems(_listStore, GreenhouseCacheModel.fromMap);
+      return ThrowableResponse.success(result);
+    } catch (e, stackTrace) {
+      return ThrowableResponse.failure(
+        AppException.fromException(e, stackTrace),
+      );
+    }
   }
 
   @override
-  void close() {
-    _controllersBox.close();
+  Future<VoidThrowableResponse> addGreenhouse(
+    GreenhouseCacheModel model,
+  ) async {
+    try {
+      await addOrUpdateItem(_listStore, model);
+      return const VoidThrowableResponse.success();
+    } catch (e, stackTrace) {
+      return VoidThrowableResponse.failure(
+        AppException.fromException(e, stackTrace),
+      );
+    }
   }
 
   @override
-  ThrowableResponse<List<GreenhouseCacheModel>> getGreenhouses() {
-    final result = fetchItems(_controllersBox);
-    return result;
-  }
-
-  @override
-  VoidThrowableResponse addGreenhouse(GreenhouseCacheModel model) {
-    final result = addOrUpdateItem(_controllersBox, model);
-    if (result.failure == null) return const VoidThrowableResponse.success();
-    return VoidThrowableResponse.failure(result.failure!);
-  }
-
-  @override
-  VoidThrowableResponse removeGreenhouse(GreenhouseCacheModel model) {
-    final result = removeItem(_controllersBox, model);
-    if (result.failure == null) return const VoidThrowableResponse.success();
-    return VoidThrowableResponse.failure(result.failure!);
+  Future<VoidThrowableResponse> removeGreenhouse(
+    GreenhouseCacheModel model,
+  ) async {
+    try {
+      await removeItem(_listStore, model);
+      return const VoidThrowableResponse.success();
+    } catch (e, stackTrace) {
+      return VoidThrowableResponse.failure(
+        AppException.fromException(e, stackTrace),
+      );
+    }
   }
 }

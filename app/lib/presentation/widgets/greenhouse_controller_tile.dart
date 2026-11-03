@@ -1,5 +1,4 @@
 import 'package:app/entities/index.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 
@@ -54,10 +53,7 @@ class GreenhouseControllerTile extends StatelessWidget {
               right: 24.0 * index,
               width: size.width * 0.78,
               child: IgnorePointer(
-                child: Image.network(
-                  plant.image,
-                  fit: BoxFit.contain,
-                ),
+                child: Image.network(plant.image, fit: BoxFit.contain),
               ),
             ),
 
@@ -88,8 +84,9 @@ class GreenhouseControllerTile extends StatelessWidget {
                       Expanded(
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
-                          child:
-                              CoreUiSmallInfoBlock.temperature(temperature: 24),
+                          child: CoreUiSmallInfoBlock.temperature(
+                            temperature: 24,
+                          ),
                         ),
                       ),
                     ],
@@ -100,15 +97,16 @@ class GreenhouseControllerTile extends StatelessWidget {
                     children: [
                       /// Controller name
                       Expanded(
-                        child: AutoSizeText(
-                          controller.name,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                          maxFontSize: 24,
-                          style: const TextStyle(
-                            color: CoreUIColors.text,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w400,
+                        child: FittedBox(
+                          child: Text(
+                            controller.name,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                            style: const TextStyle(
+                              color: CoreUIColors.text,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                         ),
                       ),

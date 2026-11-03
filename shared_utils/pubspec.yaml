@@ -1,0 +1,13 @@
+name: shared_utils
+description: "Pure Dart utilities shared across PlantPilot packages (no Flutter dependency)."
+version: 0.0.1
+publish_to: 'none'
+
+environment:
+  sdk: ^3.13.3
+
+dependencies:
+
+dev_dependencies:
+  lints: 6.1.0
+  test: 1.33.0

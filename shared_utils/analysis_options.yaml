@@ -1,0 +1,79 @@
+include: package:lints/recommended.yaml
+
+analyzer:
+  exclude:
+    - build/**
+
+
+linter:
+  rules:
+    avoid_dynamic_calls: true
+    avoid_empty_else: true
+    avoid_print: true
+    avoid_relative_lib_imports: true
+    avoid_slow_async_io: true
+    avoid_type_to_string: true
+    avoid_types_as_parameter_names: true
+    cancel_subscriptions: true
+    hash_and_equals: true
+    prefer_void_to_null: true
+    test_types_in_equals: true
+    unnecessary_statements: true
+    always_declare_return_types: true
+    annotate_overrides: true
+    avoid_return_types_on_setters: true
+    avoid_returning_null_for_void: true
+    avoid_unused_constructor_parameters: true
+    avoid_void_async: true
+    empty_catches: true
+    empty_constructor_bodies: true
+    prefer_final_locals: true
+    prefer_is_empty: true
+    prefer_is_not_empty: true
+    prefer_is_not_operator: true
+    prefer_iterable_whereType: true
+    prefer_null_aware_method_calls: true
+    unnecessary_async: true
+    unnecessary_const: true
+    unnecessary_late: true
+    unnecessary_overrides: true
+    unnecessary_parenthesis: true
+    unnecessary_this: true
+    library_private_types_in_public_api: false
+    prefer_const_constructors: true
+    unintended_html_in_doc_comment: false
+
+dart_code_metrics:
+  extends:
+      - recommended
+  rules:
+    - prefer-declaring-const-constructor: true
+    - avoid-unnecessary-nullable-return-type: true
+    - prefer-match-file-name: false
+    - prefer-spacing: false
+    - avoid-unsafe-collection-methods: false
+    - avoid-dynamic: false
+    - avoid-passing-async-when-sync-expected: false
+    - avoid-inferrable-type-arguments: false
+    - avoid-commented-out-code: false
+    - prefer-correct-callback-field-name: false
+    - avoid-enum-values-by-index: false
+    - match-getter-setter-field-names: false
+    - avoid-wildcard-cases-with-enums: false
+    - avoid-incomplete-copy-with: false
+    - no-equal-switch-case: false
+    - avoid-excessive-expressions: false
+    - no-empty-block: false
+    - avoid-throw-in-catch-block: false
+    - avoid-duplicate-cascades: false
+    - avoid-duplicate-constant-values: false
+    - avoid-shadowing: false
+    - avoid-missing-enum-constant-in-map: false
+    - prefer-switch-with-enums: false
+    - proper-super-calls: false
+    - avoid-wildcard-cases-with-sealed-classes: false
+    - avoid-default-tostring: false
+    - prefer-returning-shorthands: false
+    - prefer-shorthands-with-constructors: false
+    - avoid-unnecessary-nullable-parameters: false
+    - avoid-nested-shorthands: false

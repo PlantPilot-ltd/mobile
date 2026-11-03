@@ -1,6 +1,6 @@
 {
   "files.insertFinalNewline": true,
-  "dart.flutterSdkPath": ".fvm/versions/3.27.0",
+  "dart.flutterSdkPath": ".fvm/versions/3.47.4",
   "search.exclude": {
     "**/.fvm": true
   },

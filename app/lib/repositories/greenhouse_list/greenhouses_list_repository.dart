@@ -19,15 +19,9 @@ abstract class _GreenhousesListRepository extends VPDDataStore with Store {
   List<GreenhouseEntity> greenhouses = [];
 
   _GreenhousesListRepository({
-    required LogService logger,
-    required GreenhousesCacheServiceBase cacheService,
-  })  : _logger = logger,
-        _cacheService = cacheService;
-
-  @override
-  void dispose() {
-    _cacheService.close();
-  }
+    required this._logger,
+    required this._cacheService,
+  });
 
   @action
   Future<void> fetchData() async {
@@ -38,7 +32,7 @@ abstract class _GreenhousesListRepository extends VPDDataStore with Store {
 
   @action
   Future<void> _fetchLocalData() async {
-    final result = _cacheService.getGreenhouses();
+    final result = await _cacheService.getGreenhouses();
     if (result.failure != null) {
       _logger.logException(result.failure!);
       return;
@@ -49,8 +43,10 @@ abstract class _GreenhousesListRepository extends VPDDataStore with Store {
   }
 
   @action
-  VoidThrowableResponse addGreenhouse(GreenhouseEntity greenhouse) {
-    final result = _cacheService.addGreenhouse(greenhouse.toCache());
+  Future<VoidThrowableResponse> addGreenhouse(
+    GreenhouseEntity greenhouse,
+  ) async {
+    final result = await _cacheService.addGreenhouse(greenhouse.toCache());
     if (result.isFailed) _logger.logException(result.failure!);
     greenhouses = [...greenhouses, greenhouse];
     return const VoidThrowableResponse.success();

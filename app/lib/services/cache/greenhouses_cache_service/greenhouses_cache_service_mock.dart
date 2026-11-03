@@ -4,29 +4,29 @@ import 'package:core/core.dart';
 class GreenhousesCacheServiceMock extends GreenhousesCacheServiceBase {
   final List<GreenhouseCacheModel> _list = [];
 
-  GreenhousesCacheServiceMock({required super.configuration});
+  GreenhousesCacheServiceMock();
 
   @override
-  void cleanCache() {
+  Future<void> cleanCache() async {
     _list.clear();
   }
 
   @override
-  void close() {}
+  Future<ThrowableResponse<List<GreenhouseCacheModel>>> getGreenhouses() =>
+      Future.syncValue(ThrowableResponse.success(_list));
 
   @override
-  ThrowableResponse<List<GreenhouseCacheModel>> getGreenhouses() {
-    return ThrowableResponse.success(_list);
-  }
-
-  @override
-  VoidThrowableResponse addGreenhouse(GreenhouseCacheModel model) {
+  Future<VoidThrowableResponse> addGreenhouse(
+    GreenhouseCacheModel model,
+  ) async {
     _list.add(model);
     return const VoidThrowableResponse.success();
   }
 
   @override
-  VoidThrowableResponse removeGreenhouse(GreenhouseCacheModel model) {
+  Future<VoidThrowableResponse> removeGreenhouse(
+    GreenhouseCacheModel model,
+  ) async {
     _list.remove(model);
     return const VoidThrowableResponse.success();
   }

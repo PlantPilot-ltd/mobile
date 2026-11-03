@@ -1,5 +1,4 @@
 import 'package:app/entities/index.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
 
@@ -11,32 +10,26 @@ class PlantTile extends StatelessWidget {
   final Color _color;
   final LinearGradient _gradient;
 
-  const PlantTile({
-    super.key,
-    required this.plant,
-    this.onTap,
-  })  : _textColor = CoreUIColors.text,
-        _color = CoreUIColors.secondaryBackground,
-        _gradient = const LinearGradient(
-          begin: Alignment.bottomCenter,
-          end: Alignment.topCenter,
-          colors: [
-            CoreUIColors.secondaryBackground65,
-            CoreUIColors.secondaryBackground0,
-          ],
-        );
+  const PlantTile({super.key, required this.plant, this.onTap})
+    : _textColor = CoreUIColors.text,
+      _color = CoreUIColors.secondaryBackground,
+      _gradient = const LinearGradient(
+        begin: Alignment.bottomCenter,
+        end: Alignment.topCenter,
+        colors: [
+          CoreUIColors.secondaryBackground65,
+          CoreUIColors.secondaryBackground0,
+        ],
+      );
 
-  const PlantTile.selected({
-    super.key,
-    required this.plant,
-    this.onTap,
-  })  : _textColor = CoreUIColors.background,
-        _color = CoreUIColors.primary,
-        _gradient = const LinearGradient(
-          begin: Alignment.bottomCenter,
-          end: Alignment.topCenter,
-          colors: [CoreUIColors.primary65, CoreUIColors.primary0],
-        );
+  const PlantTile.selected({super.key, required this.plant, this.onTap})
+    : _textColor = CoreUIColors.background,
+      _color = CoreUIColors.primary,
+      _gradient = const LinearGradient(
+        begin: Alignment.bottomCenter,
+        end: Alignment.topCenter,
+        colors: [CoreUIColors.primary65, CoreUIColors.primary0],
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -109,15 +102,17 @@ class PlantTile extends StatelessWidget {
           bottom: 20,
           right: 20,
           child: IgnorePointer(
-            child: AutoSizeText(
-              plant.name,
-              maxLines: 2,
-              maxFontSize: 24,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w400,
-                letterSpacing: 0,
-                color: _textColor,
+            child: FittedBox(
+              child: Text(
+                plant.name,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 0,
+                  color: _textColor,
+                ),
               ),
             ),
           ),

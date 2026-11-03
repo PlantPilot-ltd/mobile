@@ -21,7 +21,7 @@ enum PlantTypeCacheModel {
 
 class PlantCacheModel implements CacheableObject {
   @override
-  String get key => id;
+  int get key => id.hashCode;
 
   final String id;
   final String name;
@@ -35,22 +35,22 @@ class PlantCacheModel implements CacheableObject {
     required this.type,
   });
 
-  factory PlantCacheModel.fromJson(dynamic json) {
+  factory PlantCacheModel.fromMap(Map<String, Object?> map) {
     return PlantCacheModel(
-      id: (json as Map<String, dynamic>)['id'],
-      name: json['name'],
-      image: json['image'],
-      type: PlantTypeCacheModel.fromString(json['type']),
+      id: map['id'] as String,
+      name: map['name'] as String,
+      image: map['image'] as String,
+      type: PlantTypeCacheModel.fromString(map['type'] as String),
     );
   }
 
   @override
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'image': image,
-        'type': type,
-      };
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'name': name,
+    'image': image,
+    'type': type.name,
+  };
 
   @override
   List<Object?> get props => [id, name, image, type];

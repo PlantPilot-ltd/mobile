@@ -10,10 +10,9 @@ class GreenhouseAddPresenter extends VPDPresenter<GreenhouseAddStore> {
   final TextEditingController nameController;
 
   GreenhouseAddPresenter(GreenhouseAddDependencies dependencies)
-      : appRouter = dependencies.appRouter,
-        nameController =
-            TextEditingController(text: dependencies.device.advName),
-        super(dataStore: GreenhouseAddStore(dependencies)) {
+    : appRouter = dependencies.appRouter,
+      nameController = TextEditingController(text: dependencies.device.advName),
+      super(dataStore: GreenhouseAddStore(dependencies)) {
     nameController.addListener(_onTextChanged);
   }
 
@@ -33,8 +32,8 @@ class GreenhouseAddPresenter extends VPDPresenter<GreenhouseAddStore> {
 
   void onBackTap() => appRouter.router.pop();
 
-  void onApplyTap() {
-    final result = dataStore.addGreenhouse();
+  Future<void> onApplyTap() async {
+    final result = await dataStore.addGreenhouse();
     if (result.isSuccess) {
       appRouter.router.goGreenhousesList();
     }

@@ -2,7 +2,7 @@ import 'package:app/services/index.dart';
 
 class GreenhouseCacheModel implements CacheableObject {
   @override
-  String get key => remoteId;
+  int get key => remoteId.hashCode;
 
   final String remoteId;
   final String name;
@@ -14,22 +14,22 @@ class GreenhouseCacheModel implements CacheableObject {
     required this.plants,
   });
 
-  factory GreenhouseCacheModel.fromJson(dynamic json) {
+  factory GreenhouseCacheModel.fromMap(Map<String, Object?> map) {
     return GreenhouseCacheModel(
-      remoteId: (json as Map<String, dynamic>)['remoteId'] as String,
-      name: json['name'] as String,
-      plants: (json['plants'] as List<dynamic>)
-          .map(PlantCacheModel.fromJson)
+      remoteId: map['remoteId'] as String,
+      name: map['name'] as String,
+      plants: (map['plants'] as List<dynamic>)
+          .map((e) => PlantCacheModel.fromMap(e as Map<String, Object?>))
           .toList(),
     );
   }
 
   @override
-  Map<String, dynamic> toJson() => {
-        'id': remoteId,
-        'name': name,
-        'plants': plants.map((e) => e.toJson()).toList(),
-      };
+  Map<String, dynamic> toMap() => {
+    'remoteId': remoteId,
+    'name': name,
+    'plants': plants.map((e) => e.toMap()).toList(),
+  };
 
   @override
   List<Object?> get props => [remoteId, name, plants];

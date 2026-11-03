@@ -1,110 +1,190 @@
+import 'dart:async';
+
 import 'package:app/services/index.dart';
-import 'package:core/core.dart';
-import 'package:hive/hive.dart';
+import 'package:sembast/sembast.dart';
+import 'package:shared_utils/shared_utils.dart';
 
-abstract class CacheService {
-  final CacheServiceConfiguration configuration;
+typedef FromCacheFactory<T> = T Function(Map<String, Object?>);
+typedef IntMapStore = StoreRef<int, Map<String, Object?>>;
 
-  const CacheService({required this.configuration});
+mixin CacheService {
+  Database get database;
 
-  /// Close all processes
-  void close();
+  FutureOr<void> cleanCache();
 
-  /// Clear all cache used in this service
-  void cleanCache();
-
-  /// Remove item from [box] by key [item.key] and insert new [item]
-  ThrowableResponse<T> addOrUpdateItem<T extends CacheableObject>(
-    Box<T> box,
+  ///  Remove item from [store] by key [item.key] and insert new [item]
+  Future<void> addOrUpdateItem<T extends CacheableObject>(
+    IntMapStore store,
     T item,
-  ) {
+  ) async {
     try {
-      box.write(() {
-        box.delete(item.key);
-        box.put(item.key, item);
-      });
-      return ThrowableResponse.success(item);
+      await store.record(item.key).delete(database);
+      await store.record(item.key).add(database, item.toMap());
     } catch (e, stackTrace) {
-      return ThrowableResponse.failure(
-        AppCacheException.fromException(e, stackTrace),
+      throw CacheServiceException(
+        store,
+        message: 'Failed to add or update an item in cache',
+        origin: e,
+        stackTrace: stackTrace,
       );
     }
   }
 
-  /// Return item from [box] by key [key] if exist
-  ThrowableResponse<T?> getItem<T extends CacheableObject>(
-    Box<T> box,
-    String key,
-  ) {
-    try {
-      return ThrowableResponse.success(box.get(key));
-    } catch (e, stackTrace) {
-      return ThrowableResponse.failure(
-        AppCacheException.fromException(e, stackTrace),
-      );
-    }
-  }
-
-  /// Remove [item] from [box] by key [item.key]
-  ThrowableResponse<T> removeItem<T extends CacheableObject>(
-    Box<T> box,
+  /// Remove [item] from [store] by key [item.key]
+  Future<void> removeItem<T extends CacheableObject>(
+    IntMapStore store,
     T item,
-  ) {
+  ) async {
     try {
-      box.delete(item.key);
-      return ThrowableResponse.success(item);
+      await store.record(item.key).delete(database);
     } catch (e, stackTrace) {
-      return ThrowableResponse.failure(
-        AppCacheException.fromException(e, stackTrace),
+      throw CacheServiceException(
+        store,
+        message: 'Failed to remove an item from cache',
+        origin: e,
+        stackTrace: stackTrace,
       );
     }
   }
 
-  /// Fetch all items from [box]
-  ThrowableResponse<List<T>> fetchItems<T extends CacheableObject>(
-    Box<T> box,
-  ) {
+  /// Remove item from [store] by key [key]
+  Future<void> removeItemByKey(IntMapStore store, int key) async {
     try {
-      return ThrowableResponse.success(
-        box.getAll(box.keys).whereType<T>().toList(),
-      );
+      await store.record(key).delete(database);
     } catch (e, stackTrace) {
-      return ThrowableResponse.failure(
-        AppCacheException.fromException(e, stackTrace),
+      throw CacheServiceException(
+        store,
+        message: 'Failed to remove an item from cache',
+        origin: e,
+        stackTrace: stackTrace,
       );
     }
   }
 
-  /// Clears all data in [box] and insert new [items].
-  ThrowableResponse<Iterable<T>> updateBox<T extends CacheableObject>(
-    Box<T> box,
+  Future<List<T>> fetchItems<T extends CacheableObject?>(
+    IntMapStore store,
+    FromCacheFactory<T> factory, {
+    Filter? filter,
+    List<SortOrder<Object?>>? sortOrders,
+    int? limit,
+    int? offset,
+    Boundary? start,
+    Boundary? end,
+  }) async {
+    try {
+      final records = await store.find(
+        database,
+        finder: Finder(
+          filter: filter,
+          sortOrders: sortOrders,
+          limit: limit,
+          offset: offset,
+          start: start,
+          end: end,
+        ),
+      );
+      return ListParser.parseIgnoring(
+        records,
+        (e) => factory((e as RecordSnapshot<int, Map<String, Object?>>).value),
+      );
+    } catch (e, stackTrace) {
+      throw CacheServiceException(
+        store,
+        message: 'Failed to fetch items from cache',
+        origin: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  Future<T?> fetchItemByKey<T extends CacheableObject>(
+    int key,
+    IntMapStore store,
+    FromCacheFactory<T> factory,
+  ) async {
+    try {
+      final record = await store.record(key).get(database);
+      return record == null ? null : factory(record);
+    } catch (e, stackTrace) {
+      throw CacheServiceException(
+        store,
+        message: 'Failed to fetch item by key from cache',
+        origin: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  /// Clears all data in [store] and insert new [items].
+  Future<void> updateStore<T extends CacheableObject>(
+    IntMapStore store,
     Iterable<T> items,
-  ) {
+  ) async {
     try {
       // Clean cache
-      box.clear();
+      await store.delete(database);
       // Add items
-      return addAll(box, items);
+      await addAll(store, items);
     } catch (e, stackTrace) {
-      return ThrowableResponse.failure(
-        AppCacheException.fromException(e, stackTrace),
+      throw CacheServiceException(
+        store,
+        message: 'Failed update store',
+        origin: e,
+        stackTrace: stackTrace,
       );
     }
   }
 
-  /// Add all [items] to [box]
-  ThrowableResponse<Iterable<T>> addAll<T extends CacheableObject>(
-    Box<T> box,
+  Future<void> addAll<T extends CacheableObject>(
+    IntMapStore store,
     Iterable<T> items,
-  ) {
+  ) async {
     try {
-      box.putAll(
-        Map.fromEntries(items.map((e) => MapEntry(e.key, e))),
-      );
-      return ThrowableResponse.success(items);
+      await database.transaction((txn) async {
+        for (final item in items) {
+          await store.record(item.key).add(txn, item.toMap());
+        }
+      });
     } catch (e, stackTrace) {
-      return ThrowableResponse.failure(
-        AppCacheException.fromException(e, stackTrace),
+      throw CacheServiceException(
+        store,
+        message: 'Failed to add items in cache',
+        origin: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  Future<void> removeAll<T extends CacheableObject>(
+    IntMapStore store,
+    Iterable<T> items,
+  ) async {
+    try {
+      await database.transaction((txn) async {
+        for (final item in items) {
+          await store.record(item.key).delete(txn);
+        }
+      });
+    } catch (e, stackTrace) {
+      throw CacheServiceException(
+        store,
+        message: 'Failed to add items in cache',
+        origin: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  /// Clears all data in [store]
+  Future<void> cleanStore(StoreRef store) async {
+    try {
+      await store.delete(database);
+    } catch (e, stackTrace) {
+      throw CacheServiceException(
+        store,
+        message: 'Failed to clean store',
+        origin: e,
+        stackTrace: stackTrace,
       );
     }
   }
